@@ -1,9 +1,4 @@
 
-set(LLDB_PLUGINS
-  lldbPluginProcessUtility
-  lldbPluginPlatformMacOSX
-)
-
 add_lldb_library(lldbPluginProcessGDBRemote PLUGIN
   GDBRemoteClientBase.cpp
   GDBRemoteCommunication.cpp
@@ -28,13 +23,15 @@ add_lldb_library(lldbPluginProcessGDBRemote PLUGIN
     lldbSymbol
     lldbTarget
     lldbUtility
-    ${LLDB_PLUGINS}
   LINK_COMPONENTS
     Support
   )
 
 target_include_directories(lldbPluginProcessGDBRemote PRIVATE
   ${LIBXML2_INCLUDE_DIR})
+target_link_libraries(lldbPluginProcessGDBRemote PRIVATE
+  lldbPluginProcessUtility
+  lldbPluginPlatformMacOSX)
 if(HAVE_LIBCOMPRESSION)
   target_link_libraries(lldbPluginProcessGDBRemote PRIVATE compression)
 endif()
