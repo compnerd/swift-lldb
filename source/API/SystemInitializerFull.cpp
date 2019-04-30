@@ -129,6 +129,9 @@ llvm::Error SystemInitializerFull::Initialize() {
   ObjectFileMachO::Initialize();
   ObjectFilePECOFF::Initialize();
 
+  ObjectContainerBSDArchive::Initialize();
+  ObjectContainerUniversalMachO::Initialize();
+
   ScriptInterpreterNone::Initialize();
 
 #ifndef LLDB_DISABLE_PYTHON
@@ -354,6 +357,9 @@ void SystemInitializerFull::Terminate() {
   PlatformiOSSimulator::Terminate();
   PlatformDarwinKernel::Terminate();
 #endif
+
+  ObjectContainerBSDArchive::Terminate();
+  ObjectContainerUniversalMachO::Terminate();
 
   breakpad::ObjectFileBreakpad::Terminate();
   ObjectFileELF::Terminate();

@@ -102,14 +102,9 @@ llvm::Error SystemInitializerCommon::Initialize() {
   process_gdb_remote::ProcessGDBRemoteLog::Initialize();
 
   // Initialize plug-ins
-  ObjectContainerBSDArchive::Initialize();
-
   EmulateInstructionARM::Initialize();
   EmulateInstructionMIPS::Initialize();
   EmulateInstructionMIPS64::Initialize();
-
-  // Apple/Darwin hosted plugins
-  ObjectContainerUniversalMachO::Initialize();
 
 #if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
   ProcessPOSIXLog::Initialize();
@@ -124,13 +119,10 @@ llvm::Error SystemInitializerCommon::Initialize() {
 void SystemInitializerCommon::Terminate() {
   static Timer::Category func_cat(LLVM_PRETTY_FUNCTION);
   Timer scoped_timer(func_cat, LLVM_PRETTY_FUNCTION);
-  ObjectContainerBSDArchive::Terminate();
 
   EmulateInstructionARM::Terminate();
   EmulateInstructionMIPS::Terminate();
   EmulateInstructionMIPS64::Terminate();
-
-  ObjectContainerUniversalMachO::Terminate();
 
 #if defined(_MSC_VER)
   ProcessWindowsLog::Terminate();
