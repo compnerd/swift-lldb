@@ -8,7 +8,6 @@ add_lldb_library(lldbPluginInstructionARM PLUGIN
     lldbInterpreter
     lldbSymbol
     lldbTarget
-    lldbPluginProcessUtility
   LINK_COMPONENTS
     Support
   )
