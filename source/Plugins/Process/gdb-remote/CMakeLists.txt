@@ -1,6 +1,3 @@
-if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  include_directories(${LIBXML2_INCLUDE_DIR})
-endif()
 
 set(LLDB_PLUGINS
   lldbPluginProcessUtility
@@ -36,6 +33,8 @@ add_lldb_library(lldbPluginProcessGDBRemote PLUGIN
     Support
   )
 
+target_include_directories(lldbPluginProcessGDBRemote PRIVATE
+  ${LIBXML2_INCLUDE_DIR})
 if(HAVE_LIBCOMPRESSION)
   target_link_libraries(lldbPluginProcessGDBRemote PRIVATE compression)
 endif()
