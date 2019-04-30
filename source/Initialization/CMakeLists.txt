@@ -1,10 +1,3 @@
-if ( CMAKE_SYSTEM_NAME MATCHES "Linux|Android|FreeBSD|NetBSD" )
-  list(APPEND EXTRA_PLUGINS lldbPluginProcessPOSIX)
-endif()
-
-if ( CMAKE_SYSTEM_NAME MATCHES "Windows" )
-  list(APPEND EXTRA_PLUGINS lldbPluginProcessWindowsCommon)
-endif ()
 
 add_lldb_library(lldbInitialization
   SystemInitializerCommon.cpp
@@ -18,8 +11,14 @@ add_lldb_library(lldbInitialization
     lldbPluginInstructionMIPS
     lldbPluginInstructionMIPS64
     lldbPluginProcessGDBRemote
-    ${EXTRA_PLUGINS}
     ${LLDB_SYSTEM_LIBS}
   LINK_COMPONENTS
     Support
   )
+if(CMAKE_SYSTEM_NAME MATCHES "Linux|Android|FreeBSD|NetBSD")
+  target_link_libraries(lldbInitialization PRIVATE lldbPluginProcessPOSIX)
+endif()
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+  target_link_libraries(lldbInitialization PRIVATE
+    lldbPluginProcessWindowsCommon)
+endif()
