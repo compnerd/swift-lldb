@@ -162,7 +162,8 @@ public:
                            bool repl);
 
   void FindNonVariableDeclarations(
-      llvm::SmallVectorImpl<swift::ValueDecl *> &non_variables);
+      llvm::SmallVectorImpl<swift::ValueDecl *> &non_variables,
+      std::vector<std::string> &thunks);
 
   bool FixCaptures();
 

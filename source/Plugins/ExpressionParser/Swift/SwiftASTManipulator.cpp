@@ -773,14 +773,51 @@ void SwiftASTManipulator::FindVariableDeclarations(
 }
 
 void SwiftASTManipulator::FindNonVariableDeclarations(
-    llvm::SmallVectorImpl<swift::ValueDecl *> &non_variables) {
+    llvm::SmallVectorImpl<swift::ValueDecl *> &non_variables,
+    std::vector<std::string> &thunks) {
   if (!IsValid())
     return;
 
   if (!m_repl)
     return; // we don't do this for non-REPL expressions... yet
 
+  class DefaultArgumentThunkFinder : public swift::ASTWalker {
+    std::vector<std::string> Thunks;
+
+  public:
+    explicit DefaultArgumentThunkFinder(std::vector<std::string> &thunks)
+      : Thunks(thunks) {}
+
+  private:
+    bool walkToDeclPre(swift::Decl *D) override {
+      if (auto *FD = llvm::dyn_cast<swift::FuncDecl>(D)) {
+        if (ParameterList *PL = FD->getParameters()) {
+          for (unsigned AI = 0, AE = PL->size(); AI < AE; ++AI) {
+            ParamDecl *PD = PL->get(AI);
+            switch (PD->getDefaultArgumentKind()) {
+            case swift::DefaultArgumentKind::None: break;
+
+            case swift::DefaultArgumentKind::Normal:
+              if (Expr *E = PD->getDefaultValue())
+                Thunks.emplace_back(SILDeclRef::getDefaultArgGenerator(FD, AI)
+                                        .mangle());
+              break;
+
+            // TODO(compnerd) handle the other default argument kinds
+            default: break;
+            }
+          }
+        }
+      }
+      return true;
+    }
+  };
+
+  DefaultArgumentThunkFinder DATF(thunks);
+
   for (swift::Decl *decl : m_source_file.Decls) {
+    decl->walk(DATF);
+
     if (swift::ValueDecl *value_decl = llvm::dyn_cast<swift::ValueDecl>(decl)) {
       if (!llvm::isa<swift::VarDecl>(value_decl) && value_decl->hasName()) {
         non_variables.push_back(value_decl);

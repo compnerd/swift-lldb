@@ -1607,8 +1607,12 @@ unsigned SwiftExpressionParser::Parse(DiagnosticManager &diagnostic_manager,
 
       if (repl) {
         llvm::SmallVector<swift::ValueDecl *, 1> non_variables;
+        std::vector<std:string> thunks;
         parsed_expr->code_manipulator->FindNonVariableDeclarations(
-            non_variables);
+            non_variables, thunks);
+
+        for (const auto &thunk : thunks)
+          llvm::errs() << "thunk: " << thunk << '\n';
 
         for (swift::ValueDecl *decl : non_variables) {
           persistent_state->RegisterSwiftPersistentDecl(decl);
